@@ -29,7 +29,7 @@ class _GridExampleState extends State<GridExample> {
     return  Card(
       child: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Center(child: Text('Item $index'R)),
+        child: Center(child: Text('Item $index')),
       ),
     );
   }
