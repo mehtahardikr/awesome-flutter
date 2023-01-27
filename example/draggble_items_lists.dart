@@ -1,7 +1,9 @@
+// ignore_for_file: constant_identifier_names, no_leading_underscores_for_local_identifiers, dead_code, avoid_print, library_private_types_in_public_api, avoid_unnecessary_containers
+
 import 'package:flutter/material.dart';
 
 class SampleDemo extends StatefulWidget {
-  const SampleDemo();
+  const SampleDemo({super.key});
 
   @override
   _SampleDemoState createState() => _SampleDemoState();
@@ -13,10 +15,10 @@ enum CameraRackSides { TOP, LEFT, RIGHT, BOTTOM }
 class _SampleDemoState extends State<SampleDemo> {
 
   /// scroll controllers for all list
-  ScrollController _scrollControllerTop = new ScrollController();
-  ScrollController _scrollControllerBottom = new ScrollController();
-  ScrollController _scrollControllerLeft = new ScrollController();
-  ScrollController _scrollControllerRight = new ScrollController();
+  final ScrollController _scrollControllerTop = ScrollController();
+  final ScrollController _scrollControllerBottom = ScrollController();
+  final ScrollController _scrollControllerLeft = ScrollController();
+  final ScrollController _scrollControllerRight = ScrollController();
 
 
   /// Lists
@@ -53,19 +55,19 @@ class _SampleDemoState extends State<SampleDemo> {
 
   // scroll list
   _moveUp(ScrollController _scrollController, double _height) {
-    _scrollController.animateTo(_scrollController.offset - _height, curve: Curves.linear, duration: Duration(milliseconds: 500));
+    _scrollController.animateTo(_scrollController.offset - _height, curve: Curves.linear, duration: const Duration(milliseconds: 500));
   }
 
   _moveDown(ScrollController _scrollController, double _height) {
-    _scrollController.animateTo(_scrollController.offset + _height, curve: Curves.linear, duration: Duration(milliseconds: 500));
+    _scrollController.animateTo(_scrollController.offset + _height, curve: Curves.linear, duration: const Duration(milliseconds: 500));
   }
 
   _moveLeft(ScrollController _scrollController, double _width) {
-    _scrollController.animateTo(_scrollController.offset - _width, curve: Curves.linear, duration: Duration(milliseconds: 500));
+    _scrollController.animateTo(_scrollController.offset - _width, curve: Curves.linear, duration: const Duration(milliseconds: 500));
   }
 
   _moveRight(ScrollController _scrollController, double _width) {
-    _scrollController.animateTo(_scrollController.offset + _width, curve: Curves.linear, duration: Duration(milliseconds: 500));
+    _scrollController.animateTo(_scrollController.offset + _width, curve: Curves.linear, duration: const Duration(milliseconds: 500));
   }
 
   @override
@@ -73,10 +75,10 @@ class _SampleDemoState extends State<SampleDemo> {
 
 
       itemsTop =[
-         CustomData(id: 1 , position: "top" ,row: 1 ),
-         CustomData(id: 2 , position: "top" ,row: 1 ),
-         CustomData(id: 3 , position: "top" ,row: 1 ),
-         CustomData(id: 4 , position: "top" ,row: 1 ),
+        CustomData(id: 1 , position: "top" ,row: 1 ),
+        CustomData(id: 2 , position: "top" ,row: 1 ),
+        CustomData(id: 3 , position: "top" ,row: 1 ),
+        CustomData(id: 4 , position: "top" ,row: 1 ),
       ];
 
       itemsBottom =[
@@ -107,8 +109,8 @@ class _SampleDemoState extends State<SampleDemo> {
   @override
   Widget build(BuildContext context) {
 
-    Widget _buildSizedNamedButton(String url, String name, void onPressed()) {
-      return new SizedBox(
+    Widget _buildSizedNamedButton(String url, String name, void Function() onPressed) {
+      return SizedBox(
           width: itemWidth,
           height: itemHeight,
           // child: new RaisedButton(
@@ -120,7 +122,7 @@ class _SampleDemoState extends State<SampleDemo> {
                 borderRadius: BorderRadius.zero,
               ),
               child:  Container(
-                child: Center(child: Text('$name',style: TextStyle(color: Colors.white),)),
+                child: Center(child: Text(name,style: const TextStyle(color: Colors.white),)),
               )));
     }
 
@@ -143,6 +145,7 @@ class _SampleDemoState extends State<SampleDemo> {
           return itemsBottom;
           break;
       }
+      return itemsBottom;
     }
 
     // get list position [index]
@@ -164,7 +167,7 @@ class _SampleDemoState extends State<SampleDemo> {
     }
 
     // accept dragged item
-    _doAcceptCard(DraggableCard draggedTask, TaskIndex location) {
+    _doAcceptCard(DraggableCard? draggedTask, TaskIndex location) {
       setState(() {
         _isDragStart = false;
         //_isShowExtraSpace = false;
@@ -175,14 +178,14 @@ class _SampleDemoState extends State<SampleDemo> {
         _isShowExtraSpaceBottom = false;
       });
       // from other location
-      if (location.boardIndex != draggedTask.fromLocation.boardIndex) {
+      if (location.boardIndex != draggedTask!.fromLocation.boardIndex) {
         setState(() {
           var toList = getList(location.boardIndex);
           var fromList = getList(draggedTask.fromLocation.boardIndex);
 
           print(" from board : ${draggedTask.fromLocation.boardIndex}");
           // set positions
-          draggedTask.item.position = getListPosition(location.boardIndex);
+          draggedTask.item.position = getListPosition(location.boardIndex)!;
 
           toList.insert(location.listIndex, draggedTask.item);
           fromList.removeAt(draggedTask.fromLocation.listIndex);
@@ -218,24 +221,24 @@ class _SampleDemoState extends State<SampleDemo> {
     /// add extra space at end of list
     Widget widgetForExtraSpace(int boardIndex, bool isTop) {
       return Visibility(
-          visible: getVisibilitySpace(boardIndex),
+          visible: getVisibilitySpace(boardIndex) ?? true,
           child: Container(
-              child: DragTarget(builder: (context, List<DraggableCard> candidateData, rejectedData) {
+              child: DragTarget(builder: (context, List<DraggableCard?> candidateData, rejectedData) {
                 return Container(
+                  color: Colors.transparent,
                   child: SizedBox(
                     height: itemHeight,
                     width: itemWidth,
                   ),
-                  color: Colors.transparent,
                 );
-              }, onWillAccept: (DraggableCard draggedTask) {
+              }, onWillAccept: (DraggableCard? draggedTask) {
                 print("Will accept  extra trailing space");
-                return (draggedTask.fromLocation.boardIndex != boardIndex);
-              }, onAccept: (DraggableCard draggedTask) {
+                return (draggedTask?.fromLocation.boardIndex != boardIndex);
+              }, onAccept: (DraggableCard? draggedTask) {
                 setState(() {
                   print(" from board : $boardIndex");
                   // set position
-                  draggedTask.item.position = getListPosition(boardIndex);
+                  draggedTask!.item.position = getListPosition(boardIndex)!;
 
                   if (isTop) {
                     getList(boardIndex).insert(0, draggedTask.item);
@@ -252,15 +255,14 @@ class _SampleDemoState extends State<SampleDemo> {
       return Padding(
           padding: (_isVertical ? EdgeInsets.fromLTRB(0, index == 0 ? 0 : 2, 0, 2) : EdgeInsets.fromLTRB(index == 0 ? 0 : 2, 0, 2, 0)),
           child: DragTarget(
-            builder: (context, List<DraggableCard> candidateData, rejectedData) {
+            builder: (context, List<DraggableCard?> candidateData, rejectedData) {
               return Container(
                 child: LongPressDraggable(
-                    child: _buildSizedNamedButton('', '${_list[index].id}',() {}),
-                    feedback: new Transform.rotate(
+                    feedback: Transform.rotate(
                       angle: 0, // 5 degrees to radians  0.0872665,
                       child: _buildSizedNamedButton('', '${_list[index].id}',() {}),
                     ),
-                    childWhenDragging: _buildSizedNamedButton('','', null),
+                    childWhenDragging: _buildSizedNamedButton('','', () {}),
                     data: DraggableCard(location, _list[index], itemPos: index),
                     onDragStarted: () {
                       setState(() {
@@ -277,11 +279,12 @@ class _SampleDemoState extends State<SampleDemo> {
                         _isShowExtraSpaceRight = false;
                         _isShowExtraSpaceBottom = false;
                       });
-                    }),
+                    },
+                    child: _buildSizedNamedButton('', '${_list[index].id}',() {})),
               );
             },
-            onWillAccept: (DraggableCard draggedTask) {
-              print("Top WillAccept view data======= ${location.listIndex} Dragged on index ====${draggedTask.fromLocation.listIndex}");
+            onWillAccept: (DraggableCard? draggedTask) {
+              print("Top WillAccept view data======= ${location.listIndex} Dragged on index ====${draggedTask!.fromLocation.listIndex}");
               if (location.boardIndex != draggedTask.fromLocation.boardIndex) {
                 switch (location.boardIndex) {
                   case 0:
@@ -300,8 +303,8 @@ class _SampleDemoState extends State<SampleDemo> {
               }
               return true;
             },
-            onAccept: (DraggableCard draggedTask) {
-              print("inside accept top=== ${draggedTask.itemPos}");
+            onAccept: (DraggableCard? draggedTask) {
+              print("inside accept top=== ${draggedTask!.itemPos}");
               _doAcceptCard(draggedTask, location);
             },
           ));
@@ -330,7 +333,7 @@ class _SampleDemoState extends State<SampleDemo> {
     }
 
     var _top = Container(
-      margin: EdgeInsets.fromLTRB(5, 2, 0, 1),
+      margin: const EdgeInsets.fromLTRB(5, 2, 0, 1),
       height: itemHeight,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -340,7 +343,7 @@ class _SampleDemoState extends State<SampleDemo> {
 
         /// for dummy space at last
         itemBuilder: (BuildContext context, int index) {
-          TaskIndex location = new TaskIndex(CameraRackSides.TOP.index, index);
+          TaskIndex location = TaskIndex(CameraRackSides.TOP.index, index);
           return getListItem(index, location, itemsTop, false);
         },
       ),
@@ -348,7 +351,7 @@ class _SampleDemoState extends State<SampleDemo> {
 
     var _middleViews = Expanded(
       child: Container(
-        padding: EdgeInsets.all(5),
+        padding: const EdgeInsets.all(5),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -356,7 +359,7 @@ class _SampleDemoState extends State<SampleDemo> {
             Flexible(
                 child: Container(
                     width: itemWidth,
-                    margin: EdgeInsets.fromLTRB(0, 1, 5, 3),
+                    margin: const EdgeInsets.fromLTRB(0, 1, 5, 3),
                     child: Stack(children: [
                       LayoutBuilder(builder: (context, constraints) {
                         _leftListHeight = constraints.maxHeight;
@@ -368,26 +371,26 @@ class _SampleDemoState extends State<SampleDemo> {
                               shrinkWrap: true,
                               itemCount: itemsLeft.length + 1,
                               itemBuilder: (BuildContext context, int index) {
-                                TaskIndex location = new TaskIndex(CameraRackSides.LEFT.index, index);
+                                TaskIndex location = TaskIndex(CameraRackSides.LEFT.index, index);
                                 return getListItem(index, location, itemsLeft, true);
                               }),
                           (itemsLeft.length * itemHeight) > _leftListHeight
-                              ? SizedBox()
+                              ? const SizedBox()
                               : Align(
                               alignment: Alignment.bottomCenter,
                               child: DragTarget(
-                                builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                                builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                                   width: itemWidth,
                                   height: _leftListHeight - ((itemsLeft.length * itemHeight) + 10),
                                   color: Colors.transparent,
                                 ),
-                                onWillAccept: (DraggableCard draggedTask) {
-                                  return (draggedTask.fromLocation.boardIndex != 1);
+                                onWillAccept: (DraggableCard? draggedTask) {
+                                  return (draggedTask?.fromLocation.boardIndex != 1);
                                 },
-                                onAccept: (DraggableCard draggedTask) {
+                                onAccept: (DraggableCard? draggedTask) {
                                   setState(() {
-                                    draggedTask.item.position = getListPosition(1);
-                                    getList(1).add(draggedTask.item);
+                                    draggedTask?.item.position = getListPosition(1)!;
+                                    getList(1).add(draggedTask!.item);
                                     getList(draggedTask.fromLocation.boardIndex).removeAt(draggedTask.fromLocation.listIndex);
                                   });
                                 },
@@ -395,16 +398,16 @@ class _SampleDemoState extends State<SampleDemo> {
                         ]);
                       }),
                       !_isDragStart
-                          ? SizedBox()
+                          ? const SizedBox()
                           : Align(
                         alignment: Alignment.topCenter,
                         child: DragTarget(
-                          builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                          builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                             height: 10,
                             width: itemWidth,
                             color: Colors.transparent,
                           ),
-                          onWillAccept: (DraggableCard draggedTask) {
+                          onWillAccept: (DraggableCard? draggedTask) {
                             print("will accept == Up");
                             setState(() {
                               _moveUp(_scrollControllerLeft, _leftListHeight);
@@ -415,16 +418,16 @@ class _SampleDemoState extends State<SampleDemo> {
                         ),
                       ),
                       !_isDragStart
-                          ? SizedBox()
+                          ? const SizedBox()
                           : Align(
                         alignment: Alignment.bottomCenter,
                         child: DragTarget(
-                          builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                          builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                             height: 10,
                             width: itemWidth,
                             color: Colors.transparent,
                           ),
-                          onWillAccept: (DraggableCard draggedTask) {
+                          onWillAccept: (DraggableCard? draggedTask) {
                             print("will accept == Down");
                             setState(() {
                               _moveDown(_scrollControllerLeft, _leftListHeight);
@@ -439,7 +442,7 @@ class _SampleDemoState extends State<SampleDemo> {
             Flexible(
                 child: Container(
                     width: itemWidth,
-                    margin: EdgeInsets.fromLTRB(5, 1, 0, 3),
+                    margin: const EdgeInsets.fromLTRB(5, 1, 0, 3),
                     child: Stack(children: [
                       LayoutBuilder(builder: (context, constraints) {
                         _rightListHeight = constraints.maxHeight;
@@ -450,25 +453,25 @@ class _SampleDemoState extends State<SampleDemo> {
                               shrinkWrap: true,
                               itemCount: itemsRight.length + 1,
                               itemBuilder: (BuildContext context, int index) {
-                                TaskIndex location = new TaskIndex(CameraRackSides.RIGHT.index, index);
+                                TaskIndex location = TaskIndex(CameraRackSides.RIGHT.index, index);
                                 return getListItem(index, location, itemsRight, true);
                               }),
                           (itemsRight.length * itemHeight) > _rightListHeight
-                              ? SizedBox()
+                              ? const SizedBox()
                               : Align(
                               alignment: Alignment.bottomCenter,
                               child: DragTarget(
-                                builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                                builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                                   width: itemWidth,
                                   height: _rightListHeight - ((itemsRight.length * itemHeight) + 10),
                                   color: Colors.transparent,
                                 ),
-                                onWillAccept: (DraggableCard draggedTask) {
-                                  return (draggedTask.fromLocation.boardIndex != 2);
+                                onWillAccept: (DraggableCard? draggedTask) {
+                                  return (draggedTask!.fromLocation.boardIndex != 2);
                                 },
-                                onAccept: (DraggableCard draggedTask) {
+                                onAccept: (DraggableCard? draggedTask) {
                                   setState(() {
-                                    draggedTask.item.position = getListPosition(2);
+                                    draggedTask!.item.position = getListPosition(2)!;
                                     getList(2).add(draggedTask.item);
                                     getList(draggedTask.fromLocation.boardIndex).removeAt(draggedTask.fromLocation.listIndex);
                                   });
@@ -477,16 +480,16 @@ class _SampleDemoState extends State<SampleDemo> {
                         ]);
                       }),
                       !_isDragStart
-                          ? SizedBox()
+                          ? const SizedBox()
                           : Align(
                         alignment: Alignment.topCenter,
                         child: DragTarget(
-                          builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                          builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                             height: 10,
                             width: itemWidth,
                             color: Colors.transparent,
                           ),
-                          onWillAccept: (DraggableCard draggedTask) {
+                          onWillAccept: (DraggableCard? draggedTask) {
                            print("will accept == Up");
                             setState(() {
                               _moveUp(_scrollControllerRight, _rightListHeight);
@@ -497,16 +500,16 @@ class _SampleDemoState extends State<SampleDemo> {
                         ),
                       ),
                       !_isDragStart
-                          ? SizedBox()
+                          ? const SizedBox()
                           : Align(
                         alignment: Alignment.bottomCenter,
                         child: DragTarget(
-                          builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                          builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                             height: 10,
                             width: itemWidth,
                             color: Colors.transparent,
                           ),
-                          onWillAccept: (DraggableCard draggedTask) {
+                          onWillAccept: (DraggableCard? draggedTask) {
                            print("will accept == Down");
                             setState(() {
                               _moveDown(_scrollControllerRight, _rightListHeight);
@@ -522,7 +525,7 @@ class _SampleDemoState extends State<SampleDemo> {
     );
 
     var _bottom = Container(
-        margin: EdgeInsets.fromLTRB(5, 2, 0, 1),
+        margin: const EdgeInsets.fromLTRB(5, 2, 0, 1),
         height: itemHeight,
         child: ListView.builder(
             scrollDirection: Axis.horizontal,
@@ -531,7 +534,7 @@ class _SampleDemoState extends State<SampleDemo> {
             itemCount: itemsBottom.length + 1,
             // for dummy space at last
             itemBuilder: (BuildContext context, int index) {
-              TaskIndex location = new TaskIndex(CameraRackSides.BOTTOM.index, index);
+              TaskIndex location = TaskIndex(CameraRackSides.BOTTOM.index, index);
               return getListItem(index, location, itemsBottom, false);
             }));
 
@@ -541,7 +544,7 @@ class _SampleDemoState extends State<SampleDemo> {
           children: [
             Container(
               color: const Color(0xffFFFFFF),
-              padding: EdgeInsets.all(3),
+              padding: const EdgeInsets.all(3),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
@@ -554,22 +557,22 @@ class _SampleDemoState extends State<SampleDemo> {
                         children: [
                           _top,
                           (itemsTop.length * itemWidth) > _topListWidth
-                              ? SizedBox()
+                              ? const SizedBox()
                               : Align(
                               alignment: Alignment.centerRight,
                               child: DragTarget(
-                                builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                                builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                                   height: 100,
                                   width: _topListWidth - ((itemsTop.length * itemWidth) + 10),
                                   color: Colors.transparent,
                                 ),
-                                onWillAccept: (DraggableCard draggedTask) {
-                                  return (draggedTask.fromLocation.boardIndex != 0);
+                                onWillAccept: (DraggableCard? draggedTask) {
+                                  return (draggedTask?.fromLocation.boardIndex != 0);
                                 },
-                                onAccept: (DraggableCard draggedTask) {
+                                onAccept: (DraggableCard? draggedTask) {
                                   setState(() {
-                                    draggedTask.item.position = getListPosition(0);
-                                    getList(0).add(draggedTask.item);
+                                    draggedTask?.item.position = getListPosition(0)!;
+                                    getList(0).add(draggedTask!.item);
                                     getList(draggedTask.fromLocation.boardIndex).removeAt(draggedTask.fromLocation.listIndex);
                                   });
                                 },
@@ -578,16 +581,16 @@ class _SampleDemoState extends State<SampleDemo> {
                       );
                     }),
                     !_isDragStart
-                        ? SizedBox()
+                        ? const SizedBox()
                         : Align(
                       alignment: Alignment.topRight,
                       child: DragTarget(
-                        builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                        builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                           height: 100,
                           width: 10,
                           color: Colors.transparent,
                         ),
-                        onWillAccept: (DraggableCard draggedTask) {
+                        onWillAccept: (DraggableCard? draggedTask) {
                           print("will accept == Right");
                           setState(() {
                             _moveRight(_scrollControllerTop, _topListWidth);
@@ -598,16 +601,16 @@ class _SampleDemoState extends State<SampleDemo> {
                       ),
                     ),
                     !_isDragStart
-                        ? SizedBox()
+                        ? const SizedBox()
                         : Align(
                       alignment: Alignment.topLeft,
                       child: DragTarget(
-                        builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                        builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                           height: 100,
                           width: 10,
                           color: Colors.transparent,
                         ),
-                        onWillAccept: (DraggableCard draggedTask) {
+                        onWillAccept: (DraggableCard? draggedTask) {
                           print("will accept == Left");
                           setState(() {
                             _moveLeft(_scrollControllerTop, _topListWidth);
@@ -618,9 +621,9 @@ class _SampleDemoState extends State<SampleDemo> {
                       ),
                     )
                   ]),
-                  Container(margin: EdgeInsets.fromLTRB(0, 2, 0, 0), height: 7, color: const Color(0xffD6D6D6)),
+                  Container(margin: const EdgeInsets.fromLTRB(0, 2, 0, 0), height: 7, color: const Color(0xffD6D6D6)),
                   _middleViews,
-                  Container(margin: EdgeInsets.fromLTRB(0, 0, 0, 2), height: 7, color: const Color(0xffD6D6D6)),
+                  Container(margin: const EdgeInsets.fromLTRB(0, 0, 0, 2), height: 7, color: const Color(0xffD6D6D6)),
                   Stack(children: [
                     LayoutBuilder(builder: (context, constraints) {
                       _bottomListWidth = constraints.maxWidth;
@@ -629,22 +632,22 @@ class _SampleDemoState extends State<SampleDemo> {
                         children: [
                           _bottom,
                           (itemsBottom.length * itemWidth) > _bottomListWidth
-                              ? SizedBox()
+                              ? const SizedBox()
                               : Align(
                               alignment: Alignment.centerRight,
                               child: DragTarget(
-                                builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                                builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                                   height: itemHeight,
                                   width: _bottomListWidth - ((itemsBottom.length * itemWidth) - 10),
                                   color: Colors.transparent,
                                 ),
-                                onWillAccept: (DraggableCard draggedTask) {
+                                onWillAccept: (DraggableCard? draggedTask) {
                                   print("Will accept : bottom : space");
-                                  return (draggedTask.fromLocation.boardIndex != 3);
+                                  return (draggedTask!.fromLocation.boardIndex != 3);
                                 },
-                                onAccept: (DraggableCard draggedTask) {
+                                onAccept: (DraggableCard? draggedTask) {
                                   setState(() {
-                                    draggedTask.item.position = getListPosition(3);
+                                    draggedTask!.item.position = getListPosition(3)!;
                                     getList(3).add(draggedTask.item);
                                     getList(draggedTask.fromLocation.boardIndex).removeAt(draggedTask.fromLocation.listIndex);
                                   });
@@ -654,16 +657,16 @@ class _SampleDemoState extends State<SampleDemo> {
                       );
                     }),
                     !_isDragStart
-                        ? SizedBox()
+                        ? const SizedBox()
                         : Align(
                       alignment: Alignment.bottomRight,
                       child: DragTarget(
-                        builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                        builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                           height: 100,
                           width: 10,
                           color: Colors.transparent,
                         ),
-                        onWillAccept: (DraggableCard draggedTask) {
+                        onWillAccept: (DraggableCard? draggedTask) {
                           print("will accept == Right");
                           setState(() {
                             _moveRight(_scrollControllerBottom, _bottomListWidth);
@@ -674,16 +677,16 @@ class _SampleDemoState extends State<SampleDemo> {
                       ),
                     ),
                     !_isDragStart
-                        ? SizedBox()
+                        ? const SizedBox()
                         : Align(
                       alignment: Alignment.bottomLeft,
                       child: DragTarget(
-                        builder: (context, List<DraggableCard> candidateData, rejectedData) => Container(
+                        builder: (context, List<DraggableCard?> candidateData, rejectedData) => Container(
                           height: 100,
                           width: 10,
                           color: Colors.transparent,
                         ),
-                        onWillAccept: (DraggableCard draggedTask) {
+                        onWillAccept: (DraggableCard? draggedTask) {
                           print("will accept == Left");
                           setState(() {
                             _moveLeft(_scrollControllerBottom, _bottomListWidth);
@@ -711,9 +714,9 @@ class CustomData {
   String position;
   int row;
 
-  CustomData( {this.id,
-    this.position,
-    this.row,
+  CustomData( {required this.id,
+    required this.position,
+    required this.row,
     });
 }
 
@@ -724,9 +727,8 @@ class TaskIndex {
 
   TaskIndex(this.boardIndex, this.listIndex);
 
-  @override
-  bool operator ==(other) {
-    return this.boardIndex == other.boardIndex && this.listIndex == other.listIndex;
+  bool operator (TaskIndex other) {
+    return boardIndex == other.boardIndex && listIndex == other.listIndex;
   }
 }
 
@@ -736,5 +738,5 @@ class DraggableCard {
   CustomData item;
   int itemPos;
 
-  DraggableCard(this.fromLocation, this.item, {this.itemPos});
+  DraggableCard(this.fromLocation, this.item, {required this.itemPos});
 }
